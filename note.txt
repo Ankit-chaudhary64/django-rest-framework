@@ -1,0 +1,94 @@
+# Django REST Framework Mixins – Short Notes
+
+### 1. ListModelMixin → `list()`
+
+Used to display all records (GET all data).
+
+* Returns a list of objects.
+* Mostly used in APIs like:
+  `/students/`
+
+Example:
+
+```python
+GET /students/
+```
+
+---
+
+### 2. CreateModelMixin → `create()`
+
+Used to create new data (POST request).
+
+* Adds new object into database.
+* Validates serializer data before saving.
+
+Example:
+
+```python
+POST /students/
+```
+
+---
+
+### 3. RetrieveModelMixin → `retrieve()`
+
+Used to fetch single object data.
+
+* Returns one specific record using ID.
+* Used with detail endpoints.
+
+Example:
+
+```python
+GET /students/1/
+```
+
+---
+
+### 4. UpdateModelMixin → `update()`
+
+Used to update existing object data.
+
+* Updates complete or partial data.
+* Works with PUT and PATCH requests.
+
+Example:
+
+```python
+PUT /students/1/
+```
+
+---
+
+### 5. DestroyModelMixin → `destroy()`
+
+Used to delete object from database.
+
+* Removes record permanently.
+* Uses DELETE request.
+
+Example:
+
+```python
+DELETE /students/1/
+```
+
+---
+
+# Important Point
+
+Mixins only provide functionality.
+They are mostly used with:
+
+```python
+GenericAPIView
+```
+
+Example:
+
+```python
+class StudentView(ListModelMixin,
+                  CreateModelMixin,
+                  GenericAPIView):
+```
