@@ -92,3 +92,323 @@ class StudentView(ListModelMixin,
                   CreateModelMixin,
                   GenericAPIView):
 ```
+
+
+
+
+# Generics in Django REST Framework (DRF)
+
+## Introduction
+
+Django REST Framework (DRF) me **Generics** ka use API ko fast, clean aur reusable banane ke liye kiya jata hai.
+Agar hum manually har API ke liye GET, POST, PUT, DELETE likhenge, to code bahut bada aur repetitive ho jayega.
+
+Is problem ko solve karne ke liye DRF ne **Generic Views** diye hain.
+
+Generics already built-in functionality provide karte hain:
+
+* Data fetch karna
+* Create karna
+* Update karna
+* Delete karna
+* Single object retrieve karna
+
+Isliye developer ko baar-baar same code nahi likhna padta 🚀
+
+---
+
+# Why Use Generics?
+
+## Without Generics
+
+Aapko manually likhna padta hai:
+
+* GET method
+* POST method
+* PUT method
+* DELETE method
+* Error handling
+* Queryset handling
+
+Code lengthy ho jata hai.
+
+---
+
+## With Generics
+
+Sirf:
+
+* queryset
+* serializer_class
+
+define karna hota hai.
+
+Baaki ka kaam DRF automatically handle karta hai.
+
+---
+
+# Common Generic Views in DRF
+
+| Generic View                 | Kaam                         |
+| ---------------------------- | ---------------------------- |
+| ListAPIView                  | Saara data show karta hai    |
+| CreateAPIView                | Naya data create karta hai   |
+| RetrieveAPIView              | Single object show karta hai |
+| UpdateAPIView                | Data update karta hai        |
+| DestroyAPIView               | Data delete karta hai        |
+| ListCreateAPIView            | List + Create dono           |
+| RetrieveUpdateAPIView        | Retrieve + Update            |
+| RetrieveDestroyAPIView       | Retrieve + Delete            |
+| RetrieveUpdateDestroyAPIView | Retrieve + Update + Delete   |
+
+---
+
+# Example Model
+
+```python
+from django.db import models
+
+class Student(models.Model):
+    name = models.CharField(max_length=100)
+    age = models.IntegerField()
+    course = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+```
+
+---
+
+# Serializer
+
+```python
+from rest_framework import serializers
+from .models import Student
+
+class StudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = '__all__'
+```
+
+---
+
+# 1. ListAPIView
+
+Ye sirf data show karta hai.
+
+```python
+from rest_framework.generics import ListAPIView
+from .models import Student
+from .serializers import StudentSerializer
+
+class StudentListView(ListAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+```
+
+### Output
+
+GET request par saare students show honge.
+
+---
+
+# 2. CreateAPIView
+
+Naya student create karne ke liye.
+
+```python
+from rest_framework.generics import CreateAPIView
+
+class StudentCreateView(CreateAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+```
+
+### Output
+
+POST request se naya data database me save hoga.
+
+---
+
+# 3. RetrieveAPIView
+
+Single object fetch karta hai using ID.
+
+```python
+from rest_framework.generics import RetrieveAPIView
+
+class StudentDetailView(RetrieveAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+```
+
+### URL
+
+```python
+path('student/<int:pk>/', StudentDetailView.as_view())
+```
+
+---
+
+# 4. UpdateAPIView
+
+Existing data update karta hai.
+
+```python
+from rest_framework.generics import UpdateAPIView
+
+class StudentUpdateView(UpdateAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+```
+
+---
+
+# 5. DestroyAPIView
+
+Data delete karta hai.
+
+```python
+from rest_framework.generics import DestroyAPIView
+
+class StudentDeleteView(DestroyAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+```
+
+---
+
+# Combined Generic Views
+
+DRF me combined generics bhi hote hain.
+
+---
+
+# 6. ListCreateAPIView
+
+GET + POST dono handle karta hai.
+
+```python
+from rest_framework.generics import ListCreateAPIView
+
+class StudentListCreateView(ListCreateAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+```
+
+### Methods
+
+* GET → List data
+* POST → Create data
+
+---
+
+# 7. RetrieveUpdateDestroyAPIView
+
+Single object ke liye:
+
+* GET
+* PUT
+* DELETE
+
+sab handle karta hai.
+
+```python
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
+
+class StudentRUDView(RetrieveUpdateDestroyAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+```
+
+---
+
+# URL Configuration
+
+```python
+from django.urls import path
+from .views import StudentListCreateView, StudentRUDView
+
+urlpatterns = [
+    path('students/', StudentListCreateView.as_view()),
+    path('students/<int:pk>/', StudentRUDView.as_view()),
+]
+```
+
+---
+
+# Advantages of Generics
+
+## 1. Less Code
+
+Bahut kam code likhna padta hai.
+
+## 2. Fast Development
+
+API jaldi ban jati hai.
+
+## 3. Clean Code
+
+Readable aur maintainable code hota hai.
+
+## 4. Reusability
+
+Same logic baar-baar use kar sakte ho.
+
+## 5. Built-in Features
+
+Validation aur error handling automatically milta hai.
+
+---
+
+# Generics vs APIView
+
+| APIView                          | Generics                    |
+| -------------------------------- | --------------------------- |
+| Manual methods likhne padte hain | Built-in methods milte hain |
+| Zyada code                       | Kam code                    |
+| Flexible but lengthy             | Fast and clean              |
+| Beginners ke liye tough          | Easy and efficient          |
+
+---
+
+# Important Note
+
+Generics internally:
+
+* Mixins
+* APIView
+
+ka combination use karte hain.
+
+Example:
+
+```python
+ListCreateAPIView =
+ListModelMixin +
+CreateModelMixin +
+GenericAPIView
+```
+
+Isliye generics powerful hote hain 🔥
+
+---
+
+# Conclusion
+
+DRF Generics APIs ko:
+
+* Simple
+* Fast
+* Reusable
+* Professional
+
+banane me help karte hain.
+
+Agar aap CRUD API bana rahe ho, to Generics best choice hote hain because:
+
+* code kam hota hai
+* development fast hota hai
+* maintenance easy hoti hai
+* DRF ka standard approach hai
